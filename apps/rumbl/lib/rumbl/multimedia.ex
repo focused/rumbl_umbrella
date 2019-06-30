@@ -9,6 +9,27 @@ defmodule Rumbl.Multimedia do
   alias Rumbl.Accounts
   alias Rumbl.Multimedia.{Category, Video, Annotation}
 
+  # We could have used `Ecto.Changeset.put_assoc` to put both user and video
+  # associations, but setting the foreign keys directly give the same end
+  # result.
+  def annotate_video(%Accounts.User{id: user_id}, video_id, attrs) do
+    %Annotation{video_id: video_id, user_id: user_id}
+    |> Annotation.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  # Remember, if you want to use data in an association, you need to fetch it
+  # explicitly (preload user).
+  def list_annotations(%Video{} = video, since_id \\ 0) do
+    Repo.all(
+      from a in Ecto.assoc(video, :annotations),
+        where: a.id > ^since_id,
+        order_by: [asc: a.at, asc: a.id],
+        limit: 500,
+        preload: [:user]
+    )
+  end
+
   def list_alphabetical_categories do
     Category
     |> Category.alphabetical()
@@ -130,27 +151,6 @@ defmodule Rumbl.Multimedia do
     video
     |> Video.changeset(%{})
     |> put_user(user)
-  end
-
-  # We could have used `Ecto.Changeset.put_assoc` to put both user and video
-  # associations, but setting the foreign keys directly give the same end
-  # result.
-  def annotate_video(%Accounts.User{id: user_id}, video_id, attrs) do
-    %Annotation{video_id: video_id, user_id: user_id}
-    |> Annotation.changeset(attrs)
-    |> Repo.insert()
-  end
-
-  # Remember, if you want to use data in an association, you need to fetch it
-  # explicitly (preload user).
-  def list_annotations(%Video{} = video, since_id \\ 0) do
-    Repo.all(
-      from a in Ecto.assoc(video, :annotations),
-        where: a.id > ^since_id,
-        order_by: [asc: a.at, asc: a.id],
-        limit: 500,
-        preload: [:user]
-    )
   end
 
   defp put_user(changeset, user) do
