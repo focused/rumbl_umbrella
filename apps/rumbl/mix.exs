@@ -38,8 +38,7 @@ defmodule Rumbl.Mixfile do
     [
       {:postgrex, ">= 0.14.3"},
       {:ecto_sql, "~> 3.1"},
-      {:pbkdf2_elixir, "~> 1.0"},
-      {:sweet_xml, "~> 0.6.6"}
+      {:pbkdf2_elixir, "~> 1.0"}
     ]
   end
 
