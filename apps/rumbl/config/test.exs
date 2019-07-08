@@ -9,4 +9,7 @@ config :rumbl, Rumbl.Repo,
   hostname: "localhost",
   pool: Ecto.Adapters.SQL.Sandbox
 
+# ownership_timeout: 60_000,
+# timeout: 60_000
+
 config :pbkdf2_elixir, :rounds, 1
